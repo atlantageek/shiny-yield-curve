@@ -1,27 +1,43 @@
 from shiny.express import input, render, ui
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+from datetime import datetime
 
-
+result_df=pd.read_csv("years35curve.csv")
 
 data = {
-    "Maturity": ['1Y', '2Y', '3Y', '4Y', '5Y', '6Y', '7Y', '8Y'],
-    "Yield": [4.1, 4.3, 4.5, 4.7, 4.8, 4.9, 5.0, 5.1]
+     '1Y': 4.1, '2Y': 4.3, '3Y': 4.5, '4Y': 4.7, 
+    '5Y': 4.8, '6Y': 4.9, '7Y': 5.0, '8Y': 5.1
 }
-data=np.array([data["Maturity"], data["Yield"]])
+
 #df = pd.DataFrame(data)
-print(data[1])
+
 def create_line_plot():
-    x = data[0]
-    y = data[1]
+    target_date=input.date().strftime('%m/%d/%Y')
+    #target_date=input.date()
+    target_row = result_df[result_df['Date'] == target_date]
+    print(target_row)
+    x = list(['1 Yr','2 Yr','3 Yr','5 Yr','7 Yr','10 Yr','30 Yr'])
+    y = list(target_row[x].values[0])
+    print("xxx")
+    print(x)
+    print(y)
+    print("yyy")
     fig, ax = plt.subplots()
     #fig.title("Yield Curve")
     ax.bar(x, y)
     ax.set_xlabel("Maturity")
     ax.yaxis.set_label_text("Yield (%)")
-    ax.set_ylim(bottom=0)  # Ensures the y-axis starts at 0 # Ensures the y-axis starts at 0
+    #ax.set_ylim(bottom=3)  # Ensures the y-axis starts at 0 # Ensures the y-axis starts at 0
     return fig
-
+@render.text
+def value():
+    return input.date()
 @render.plot
 def my_plot():
     return create_line_plot()
+
+ui.input_date("date", "Select Date", value="2019-10-01")
+
+#d
